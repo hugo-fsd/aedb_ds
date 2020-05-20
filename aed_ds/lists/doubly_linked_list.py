@@ -38,8 +38,9 @@ class DoublyLinkedList(SinglyLinkedList):
         if self.count == 0:
             self.head = new_node
             self.tail = new_node
-        self.tail.set_next(new_node)    
-        self.tail = new_node
+        else:    
+            self.tail.set_next(new_node)    
+            self.tail = new_node
         self.count += 1
 
     # Inserts the specified element at the specified position in the list.
