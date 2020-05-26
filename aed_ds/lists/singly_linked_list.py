@@ -106,6 +106,7 @@ class SinglyLinkedList(List):
                 current_node.set_next(new_node)
                 self.count += 1
 
+            self.count += 1
     # Removes and returns the element at the first position in the list.
     # Throws EmptyListException.
     def remove_first(self):
