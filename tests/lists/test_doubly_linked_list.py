@@ -3,7 +3,7 @@ import unittest
 from aed_ds.exceptions import EmptyListException, InvalidPositionException
 from aed_ds.lists.doubly_linked_list import DoublyLinkedList
 from aed_ds.lists.doubly_linked_list_iterator import DoublyLinkedListIterator
-from aed_ds.lists.tad_iterator import Iterator
+from aed_ds.tad_iterator import Iterator, TwoWayIterator
 
 class TestDoublyLinkedList(unittest.TestCase):
     def setUp(self):
