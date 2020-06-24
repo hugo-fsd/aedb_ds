@@ -1,153 +1,124 @@
-import unittest
+from .tad_tree import Tree
+from ..dictionaries.tad_ordered_dictionary import OrderedDictionary
+from ..exceptions import DuplicatedKeyException, NoSuchElementException, \
+    EmptyDictionaryException, EmptyTreeException
+from .nodes.binary_nodes import BinarySearchTreeNode
 
-from aed_ds.trees.binary_search_tree import BinarySearchTree
-from aed_ds.exceptions import NoSuchElementException, DuplicatedKeyException, \
-    EmptyTreeException
-from aed_ds.tad_iterator import Iterator
 
+class BinarySearchTree(OrderedDictionary, Tree):
+    def __init__(self):
+        self.root = None
+        self.tree_height = 0
+        self.count = 0
 
-class TestBinarySearchTree(unittest.TestCase):
-    def setUp(self):
-        self.tree = BinarySearchTree()
+    # Returns the number of elements in the dictionary.
+    def size(self):
+        return self.count
 
-    def add_items(self, quantity, shift=0):
-        for i in range(quantity):
-            k = i+1+shift
-            v = f"value_{i+1+shift}"
-            self.tree.insert(k, v)
+    # Returns true if the dictionary is full.
+    def is_full(self):
+        return False
 
-    def remove_items(self, quantity, shift=0):
-        for i in range(quantity):
-            k = i+1+shift
-            self.tree.remove(k)
+    # Returns the value associated with key k.
+    # Throws NoSuchElementException
+    def get(self, k):
+        if self.get_element(self.root, k) == None:
+            raise NoSuchElementException()
+        else:
+            return self.get_element(self.root, k).get_element() 
 
-    def remove_elements(self, quantity):
-        for _ in range(quantity):
-            self.list.remove_last()
+    def get_element(self, root, k):
+        if root == None:
+            return None
+        elif root.get_key() == k:
+            return root.get_element()
+        elif root.get_key() < k:
+            root = self.get_element(root.get_left_child(), k)
+        else:
+            root = self.get_element(root.get_right_child(), k)
+        return root       
 
-    def test_size(self):
-        self.assertEqual(self.tree.size(), 0)
-        self.add_items(3)
-        self.assertEqual(self.tree.size(), 3)
+    # Inserts a new value, associated with key k.
+    # Throws DuplicatedKeyException
+    def insert(self, k, v):
+        self.root = self.insert_element(self.root, k, v)
 
-    def test_is_full(self):
-        self.assertFalse(self.tree.is_full())
+    def insert_element(self, root, k, v):
+        if root is None:
+            root = BinarySearchTreeNode(k, v)
+            self.count += 1
+        else:
+            if root.get_key() == k:
+                raise DuplicatedKeyException()
+            elif root.get_key() > k:
+                node = self.insert_element(root.get_left_child(), k, v)
+                root.set_left_child(node)
+            else:
+                node = self.insert_element(root.get_right_child(), k, v)
+                root.set_right_child(node)
+        return root
 
-    def test_get(self):
-        with self.assertRaises(NoSuchElementException):
-            self.tree.get(42)
-        self.add_items(3)
-        self.assertEqual(self.tree.get(2), "value_2")
+    # Updates the value associated with key k.
+    # Throws NoSuchElementException
+    def update(self, k, v): pass
 
-    def test_insert(self):
-        self.tree.insert(5, "value_5")
-        with self.assertRaises(DuplicatedKeyException):
-            self.tree.insert(5, "value_5")
-        self.assertFalse(type(self.tree.root), "NoneType")    
+    # Removes the key k, and the value associated with it.
+    # Throws NoSuchElementException
+    def remove(self, k): pass
 
-    def test_update(self):
-        with self.assertRaises(NoSuchElementException):
-            self.tree.get(3)
-        self.add_items(5)
-        self.tree.update(3, "new_value_3")
-        self.assertEqual(self.tree.get(3), "new_value_3")
+    # Returns a List with all the keys in the dictionary.
+    def keys(self): pass
 
-    def test_remove(self):
-        with self.assertRaises(NoSuchElementException):
-            self.tree.get(3)
-        self.add_items(5)
-        self.tree.remove(3)
-        with self.assertRaises(NoSuchElementException):
-            self.tree.get(3)
+    # Returns a List with all the values in the dictionary.
+    def values(self): pass
 
-    def test_keys(self):
-        self.assertTrue(self.tree.keys().is_empty())
-        self.add_items(5)
-        self.assertEqual(self.tree.keys().get(0), 1)
-        self.assertEqual(self.tree.keys().get(1), 2)
-        self.assertEqual(self.tree.keys().get(2), 3)
-        self.assertEqual(self.tree.keys().get(3), 4)
-        self.assertEqual(self.tree.keys().get(4), 5)
+    # Returns a List with all the key value pairs in the dictionary.
+    def items(self): pass
 
-    def test_values(self):
-        self.assertTrue(self.tree.values().is_empty())
-        self.add_items(5)
-        self.assertEqual(self.tree.values().get(0), "value_1")
-        self.assertEqual(self.tree.values().get(1), "value_2")
-        self.assertEqual(self.tree.values().get(2), "value_3")
-        self.assertEqual(self.tree.values().get(3), "value_4")
-        self.assertEqual(self.tree.values().get(4), "value_5")
+    # Returns an iterator of the elements in the dictionary
+    def iterator(self): pass
 
-    def test_items(self):
-        self.assertTrue(self.tree.items().is_empty())
-        self.add_items(5)
-        self.assertEqual(self.tree.values().get(0).get_value(), "value_1")
-        self.assertEqual(self.tree.values().get(1).get_value(), "value_2")
-        self.assertEqual(self.tree.values().get(2).get_value(), "value_3")
-        self.assertEqual(self.tree.values().get(3).get_value(), "value_4")
-        self.assertEqual(self.tree.values().get(4).get_value(), "value_5")
-        self.assertEqual(self.tree.values().get(0).get_key(), 1)
-        self.assertEqual(self.tree.values().get(1).get_key(), 2)
-        self.assertEqual(self.tree.values().get(2).get_key(), 3)
-        self.assertEqual(self.tree.values().get(3).get_key(), 4)
-        self.assertEqual(self.tree.values().get(4).get_key(), 5)
+    # Returns the element with the smallest key
+    # Throws EmptyTreeException
+    def get_min_element(self):
+        if self.is_empty():
+            raise EmptyDictionaryException()
+        return self.get_min_node(self.root).get_element()
 
-    def test_iterator(self):
-        self.assertIsInstance(self.tree.iterator(), Iterator)
+    def get_min_node(self, root):
+        if root.get_left_child() is None:
+            return root
+        return self.get_min_node(root.get_left_child())
 
-    def test_get_min_element(self):
-        with self.assertRaises(EmptyTreeException):
-            self.tree.get_min_element()
-        self.tree.insert(2, "value_2")
-        self.tree.insert(5, "value_5")
-        self.tree.insert(3, "value_3")
-        self.tree.insert(4, "value_4")
-        self.tree.insert(1, "value_1")
-        self.assertEqual(self.tree.get_min_element(), "value_1")
+    # Returns the element with the largest key
+    # Throws EmptyTreeException
+    def get_max_element(self):
+        if self.is_empty():
+            raise EmptyDictionaryException()
+        return self.get_max_node(self.root).get_element()
 
-    def test_get_max_element(self):
-        with self.assertRaises(EmptyTreeException):
-            self.tree.get_max_element()
-        self.tree.insert(2, "value_2")
-        self.tree.insert(5, "value_5")
-        self.tree.insert(3, "value_3")
-        self.tree.insert(4, "value_4")
-        self.tree.insert(1, "value_1")
-        self.assertEqual(self.tree.get_max_element(), "value_5")
+    def get_max_node(self, root):
+        if root.get_right_child() is None:
+            return root
+        return self.get_max_node(root.get_right_child())
 
-    def test_get_root(self):
-        with self.assertRaises(EmptyTreeException):
-            self.tree.get_root()
-        self.tree.insert(5, "value_5")
-        self.assertEqual(self.tree.get_root(), "value_5")
-        self.tree.insert(2, "value_2")
-        self.tree.insert(1, "value_1")
-        self.tree.insert(3, "value_3")
-        self.tree.insert(7, "value_7")
-        self.tree.insert(6, "value_6")
-        self.tree.insert(8, "value_8")
-        self.assertEqual(self.tree.get_root(), "value_5")
-        self.tree.remove(5)
-        self.assertEqual(self.tree.get_root(), "value_6")
+    # Returns the root of the tree
+    # Throws EmptyTreeException
+    def get_root(self):
+        if self.is_empty():
+            raise EmptyTreeException()
+        else:
+            return self.root.get_element()
 
-    def test_height(self):
-        with self.assertRaises(EmptyTreeException):
-            self.tree.height()
-        self.tree.insert(5, "value_5")
-        self.assertEqual(self.tree.height(), 1)
-        self.tree.insert(2, "value_2")
-        self.assertEqual(self.tree.height(), 2)
-        self.tree.insert(1, "value_1")
-        self.assertEqual(self.tree.height(), 3)
-        self.tree.insert(3, "value_3")
-        self.tree.insert(7, "value_7")
-        self.tree.insert(6, "value_6")
-        self.tree.insert(8, "value_8")
-        self.assertEqual(self.tree.height(), 3)
+    # Returns the height of the tree
+    # Throws EmptyTreeException
+    def height(self):
+        if self.is_empty():
+            raise EmptyTreeException()
+        else:
+            return self.tree_height
 
-    def test_is_empty(self):
-        self.assertTrue(self.tree.is_empty())
-        self.add_items(3)
-        self.assertFalse(self.tree.is_empty())
-        self.remove_items(3)
-        self.assertTrue(self.tree.is_empty())
+    # Returns True if the tree is empty
+    def is_empty(self): 
+        return self.count == 0
+    
